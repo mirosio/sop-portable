@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>{{ doc.title }}</title>
+<style>
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-Light.ttf') format('truetype'); font-weight: 300; font-display: block; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-Regular.ttf') format('truetype'); font-weight: 400; font-display: block; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-Medium.ttf') format('truetype'); font-weight: 500; font-display: block; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: block; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-Bold.ttf') format('truetype'); font-weight: 700; font-display: block; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-ExtraBold.ttf') format('truetype'); font-weight: 800; font-display: block; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-Black.ttf') format('truetype'); font-weight: 900; font-display: block; }
+{% include "styles.css" %}
+</style>
+</head>
+<body>
+<div class="landingpage">
+    <div class="landingpage-logo-block"><img src="logo.png" alt="Logo"><div class="company-name">{{ doc.company }}</div></div>
+    <div class="landingpage-title-block"><span class="landingpage-eyebrow">دستورالعمل اجرایی — تولید</span><h1 class="landingpage-title">{{ doc.title_html | safe }}</h1><p class="landingpage-subtitle">{{ doc.subtitle }}</p></div>
+    <div class="landingpage-meta"><div class="landingpage-meta-item"><div class="label">Department</div><div class="value">{{ doc.department }}</div></div><div class="landingpage-meta-item"><div class="label">Process Owner</div><div class="value">{{ doc.process_owner }}</div></div><div class="landingpage-meta-item"><div class="label">Last Revised</div><div class="value">{{ doc.last_revision_date }}</div></div></div>
+    <div class="landingpage-footer"><div>© {{ doc.issue_date[:4] }} {{ doc.company }}</div><div class="confidential">CONFIDENTIAL</div></div>
+</div>
+<div class="main-content">
+<div class="page-marker"><div class="doc-ref">{{ doc.doc_type_prefix }}</div><div class="page-tag">فرآیند تولید</div></div>
+<div class="chapter-header"><span class="section-tag">PRODUCTION</span><h2 class="section-title">فرآیند تولید</h2><p class="section-subtitle">هر مرحله در یک صفحه مجزا.</p><hr class="divider"></div>
+<h3 class="subsection-title">نمای کلی فازها</h3>
+<p class="body-text">فرآیند تولید در یک جریان خطی تک‌جهته اجرا می‌شود.</p>
+<div class="phase-overview">{% for phase in phases %}<div class="phase-chip"><div class="ph-num">{{ phase.letter }}</div><div class="ph-name">{{ phase.short_name }}</div><div class="ph-steps">{{ phase.steps_count }} مرحله</div></div>{% endfor %}</div>
+{% for step in steps %}
+{% set phase_info = namespace(obj=None) %}
+{% for phase in phases if phase.letter == step.phase %}{% set phase_info.obj = phase %}{% endfor %}
+<div class="step-page-wrapper">
+    <div class="phase-banner-step phase-{{ step.phase }}">
+        <div class="phase-info">
+            <div class="phase-name-text">{{ phase_info.obj.short_name if phase_info.obj else step.phase }} — {{ phase_info.obj.title if phase_info.obj else '' }}</div>
+            {% if step.section_responsible %}<div class="phase-subtitle-text"><span class="responsible-label">مسئول بخش:</span> {{ step.section_responsible }}</div>{% endif %}
+            <div class="doc-code-bar"><span class="code-tag">{{ doc.doc_type_prefix }}-{{ step.doc_code }}</span>{% if step.step_version %}<span>{{ step.step_version }}</span>{% endif %}{% if step.step_date %}<span>{{ step.step_date }}</span>{% endif %}</div>
+        </div>
+        <div class="phase-right"><div class="phase-label-tag">PHASE</div><div class="phase-badge">{{ step.phase }}</div></div>
+    </div>
+    <div class="step-card">
+        <div class="step-card-head"><div class="step-number">{{ step.num_persian }}</div><h4 class="step-title">{{ step.title }}</h4><div class="step-station">ایستگاه {{ step.station }}</div></div>
+        <div class="step-body"><ol class="step-actions">{% for action in step.actions %}<li class="numbered">{{ action }}</li>{% endfor %}</ol></div>
+        {% if step.gallery_html %}{{ step.gallery_html | safe }}{% endif %}
+        <div class="step-resources"><div class="resource-block"><div class="label">ابزار مورد نیاز</div><div class="value">{{ step.tools }}</div></div><div class="resource-block"><div class="label">مواد و ملزومات</div><div class="value">{{ step.materials }}</div></div></div>
+        {% if step.acceptance %}<div class="step-acceptance"><span class="label">معیار پذیرش:</span> {{ step.acceptance }}</div>{% endif %}
+    </div>
+    <div class="step-info-bar"><div class="info-item"><strong>{{ doc.doc_type_prefix }}-{{ step.doc_code }}</strong></div><div class="info-item">آخرین ویرایش: <strong>{{ doc.last_revision_date }}</strong></div><div class="info-item">{{ doc.company }}</div></div>
+</div>
+{% endfor %}
+</div>
+<div class="ending"><div class="ending-block"><span class="ending-eyebrow">پایان دستورالعمل</span><h2 class="ending-title">برای اجرای اثربخش<br>این سند، آموزش‌های دوره‌ای را فراموش نکنید</h2><p class="ending-text">این دستورالعمل باید سالانه بازنگری شود.</p></div><div class="ending-meta"><div class="meta-block"><strong>{{ doc.doc_type_prefix }}</strong>{{ doc.title }}</div><div class="meta-block"><strong>آخرین ویرایش</strong>{{ doc.last_revision_date }}</div></div></div>
+</body></html>
